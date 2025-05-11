@@ -8,7 +8,7 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/Users/memeh/Desktop/Desktop/Desktop/Marlin-2.1.2.5/Marlin-2.1.2.5/Marlin",
+                "E:/Hobby/3D-Druck/MyMarlinConfig/Marlin",
                 "C:/Users/memeh/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "C:/Users/memeh/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "C:/Users/memeh/.platformio/packages/framework-arduino-avr/cores/arduino",
@@ -21,7 +21,7 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/Users/memeh/Desktop/Desktop/Desktop/Marlin-2.1.2.5/Marlin-2.1.2.5/Marlin",
+                    "E:/Hobby/3D-Druck/MyMarlinConfig/Marlin",
                     "C:/Users/memeh/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "C:/Users/memeh/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "C:/Users/memeh/.platformio/packages/framework-arduino-avr/cores/arduino",
