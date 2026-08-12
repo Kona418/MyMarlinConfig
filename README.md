@@ -1,141 +1,481 @@
-<p align="center"><img src="buildroot/share/pixmaps/logo/marlin-outrun-nf-500.png" height="250" alt="MarlinFirmware's logo" /></p>
+# Ender 3 Pro – Kalibrierungsanleitung für Orca Slicer
 
-<h1 align="center">Marlin 3D Printer Firmware</h1>
+*Technische Dokumentation für den Ender 3 Pro mit Glasbett, CR Touch, Mainboard 4.2.2, Bi-Metall Heatbreak und Metall-Extruder*
 
-<p align="center">
-    <a href="/LICENSE"><img alt="GPL-V3.0 License" src="https://img.shields.io/github/license/marlinfirmware/marlin.svg"></a>
-    <a href="https://github.com/MarlinFirmware/Marlin/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/marlinfirmware/marlin.svg"></a>
-    <a href="https://github.com/MarlinFirmware/Marlin/releases"><img alt="Last Release Date" src="https://img.shields.io/github/release-date/MarlinFirmware/Marlin"></a>
-    <a href="https://github.com/MarlinFirmware/Marlin/actions/workflows/ci-build-tests.yml"><img alt="CI Status" src="https://github.com/MarlinFirmware/Marlin/actions/workflows/ci-build-tests.yml/badge.svg"></a>
-    <a href="https://github.com/sponsors/thinkyhead"><img alt="GitHub Sponsors" src="https://img.shields.io/github/sponsors/thinkyhead?color=db61a2"></a>
-    <br />
-    <a href="https://fosstodon.org/@marlinfirmware"><img alt="Follow MarlinFirmware on Mastodon" src="https://img.shields.io/mastodon/follow/109450200866020466?domain=https%3A%2F%2Ffosstodon.org&logoColor=%2300B&style=social"></a>
-</p>
+---
 
-Additional documentation can be found at the [Marlin Home Page](//marlinfw.org/).
-Please test this firmware and let us know if it misbehaves in any way. Volunteers are standing by!
+## Inhaltsverzeichnis
 
-## Marlin 2.1
+1. [Hardware-Übersicht](#1-hardware-übersicht)
+2. [Vorbereitung](#2-vorbereitung)
+3. [Mechanische Grundeinstellung](#3-mechanische-grundeinstellung)
+4. [Haftmittel und Hilfsmittel](#4-haftmittel-und-hilfsmittel)
+5. [Kalibrierung](#5-kalibrierung)
+6. [Orca Slicer Einstellungen](#6-orca-slicer-einstellungen)
+7. [Fehlerbehebung](#7-fehlerbehebung)
+8. [Glossar](#8-glossar)
+9. [Referenzlinks](#9-referenzlinks)
+10. [Anhang: Firmware-Update](#10-anhang-firmware-update)
 
-Marlin 2.1 continues to support both 32-bit ARM and 8-bit AVR boards while adding support for up to 9 coordinated axes and to up to 8 extruders.
+---
 
-Download earlier versions of Marlin on the [Releases page](//github.com/MarlinFirmware/Marlin/releases).
+## 1. Hardware-Übersicht
 
-## Example Configurations
+Der Ender 3 Pro in dieser Konfiguration verfügt über:
 
-Before you can build Marlin for your machine you'll need a configuration for your specific hardware. Upon request, your vendor will be happy to provide you with the complete source code and configurations for your machine, but you'll need to get updated configuration files if you want to install a newer version of Marlin. Fortunately, Marlin users have contributed dozens of tested configurations to get you started. Visit the [MarlinFirmware/Configurations](//github.com/MarlinFirmware/Configurations) repository to find the right configuration for your hardware.
+- **Glasbett:** Fest mit Thermoklebeband montiert, Reinigung nur mit feuchtem Tuch
+- **CR Touch:** Automatische Bettvermessung, ersetzt mechanischen Z-Endschalter
+- **Bi-Metall Heatbreak:** PTFE-Schlauch endet vor dem Heatbreak, Retraction auf 2,5–3,5 mm begrenzen
+- **Mainboard 4.2.2 mit Inverted Electronics Mod:** 32-Bit, leise Treiber, Elektronik von oben/vorne zugänglich
+- **Metall-Extruder:** Standardmäßiger Extruder mit ~97 E-Steps
+- **BMG-Clone (zukünftig):** Bei Nachrüstung E-Steps auf ~415 ändern
+- **Silikonpuffer (zukünftig):** Ersetzen Metallfedern unter dem Bett für mehr Stabilität
 
-## Building Marlin 2.1
+---
 
-To build and upload Marlin you will use one of these tools:
+## 2. Vorbereitung
 
-- The free [Visual Studio Code](//code.visualstudio.com/download) using the [Auto Build Marlin](//marlinfw.org/docs/basics/auto_build_marlin.html) extension.
-- The free [Arduino IDE](//www.arduino.cc/en/main/software) : See [Building Marlin with Arduino](//marlinfw.org/docs/basics/install_arduino.html)
-- You can also use VSCode with devcontainer : See [Installing Marlin (VSCode devcontainer)](http://marlinfw.org/docs/basics/install_devcontainer_vscode.html).
+### Benötigte Werkzeuge
+- Messschieber
+- Inbusschlüssel: 1,5 mm, 2 mm, 2,5 mm, 3 mm, 4 mm
+- Maulschlüssel: 6 mm, 8 mm, 10 mm
+- Spülmittel (Fit) und fusselfreies Tuch oder trockener Glasreiniger
+- Filament (PLA oder PETG)
+- SD-Karte (FAT32, max. 32 GB, 4096 Bytes Zuordnungseinheiten) für Firmware-Updates
 
-Marlin is optimized to build with the **PlatformIO IDE** extension for **Visual Studio Code**. You can still build Marlin with **Arduino IDE**, and we hope to improve the Arduino build experience, but at this time PlatformIO is the better choice.
+### Empfohlene Materialien
 
-## 8-Bit AVR Boards
+| Material | Hotend-Temperatur | Bett-Temperatur | Besonderheiten |
+|----------|------------------|-----------------|---------------|
+| PLA | 190–210 °C | 55–65 °C | Haftverstärker optional |
+| PETG | 230–250 °C | 75–85 °C | **Trennschicht zwingend erforderlich!** |
 
-We intend to continue supporting 8-bit AVR boards in perpetuity, maintaining a single codebase that can apply to all machines. We want casual hobbyists and tinkerers and owners of older machines to benefit from the community's innovations just as much as those with fancier machines. Plus, those old AVR-based machines are often the best for your testing and feedback!
+**Hinweis:** PETG erfordert aufgrund des Glasbetts +5 °C höhere Betttemperatur als Standard. **Warnung:** PETG geht mit blankem Glas eine extrem feste Verbindung ein und kann beim Abkühlen Glassplitter aus der Oberfläche herausreißen (Glass Chipping). Immer eine Trennschicht auftragen.
 
-## Hardware Abstraction Layer (HAL)
+---
 
-Marlin includes an abstraction layer to provide a common API for all the platforms it targets. This allows Marlin code to address the details of motion and user interface tasks at the lowest and highest levels with no system overhead, tying all events directly to the hardware clock.
+## 3. Mechanische Grundeinstellung
 
-Every new HAL opens up a world of hardware. At this time we need HALs for RP2040 and the Duet3D family of boards. A HAL that wraps an RTOS is an interesting concept that could be explored. Did you know that Marlin includes a Simulator that can run on Windows, macOS, and Linux? Join the Discord to help move these sub-projects forward!
+### 3.1 Riemenspannung prüfen
 
-### Supported Platforms
+**X- und Y-Achse:**
+1. Drucker ausschalten
+2. Riemen in der Mitte mit dem Finger eindrücken
+3. Optimal: 2–3 mm Durchbiegung, kein Durchhängen
+4. Nachspannen: Schrauben am Riemenspanner lösen, Riemen straffen, fixieren
 
-  Platform|MCU|Example Boards
-  --------|---|-------
-  [Arduino AVR](//www.arduino.cc/)|ATmega|RAMPS, Melzi, RAMBo
-  [Teensy++ 2.0](//www.microchip.com/en-us/product/AT90USB1286)|AT90USB1286|Printrboard
-  [Arduino Due](//www.arduino.cc/en/Guide/ArduinoDue)|SAM3X8E|RAMPS-FD, RADDS, RAMPS4DUE
-  [ESP32](//github.com/espressif/arduino-esp32)|ESP32|FYSETC E4, E4d@BOX, MRR
-  [LPC1768](//www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/lpc1700-cortex-m3/512-kb-flash-64-kb-sram-ethernet-usb-lqfp100-package:LPC1768FBD100)|ARM® Cortex-M3|MKS SBASE, Re-ARM, Selena Compact
-  [LPC1769](//www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/lpc1700-cortex-m3/512-kb-flash-64-kb-sram-ethernet-usb-lqfp100-package:LPC1769FBD100)|ARM® Cortex-M3|Smoothieboard, Azteeg X5 mini, TH3D EZBoard
-  [STM32F103](//www.st.com/en/microcontrollers-microprocessors/stm32f103.html)|ARM® Cortex-M3|Malyan M200, GTM32 Pro, MKS Robin, BTT SKR Mini
-  [STM32F401](//www.st.com/en/microcontrollers-microprocessors/stm32f401.html)|ARM® Cortex-M4|ARMED, Rumba32, SKR Pro, Lerdge, FYSETC S6, Artillery Ruby
-  [STM32F7x6](//www.st.com/en/microcontrollers-microprocessors/stm32f7x6.html)|ARM® Cortex-M7|The Borg, RemRam V1
-  [STM32G0B1RET6](//www.st.com/en/microcontrollers-microprocessors/stm32g0x1.html)|ARM® Cortex-M0+|BigTreeTech SKR mini E3 V3.0
-  [STM32H743xIT6](//www.st.com/en/microcontrollers-microprocessors/stm32h743-753.html)|ARM® Cortex-M7|BigTreeTech SKR V3.0, SKR EZ V3.0, SKR SE BX V2.0/V3.0
-  [SAMD21P20A](//www.adafruit.com/product/4064)|ARM® Cortex-M0+|Adafruit Grand Central M4
-  [SAMD51P20A](//www.adafruit.com/product/4064)|ARM® Cortex-M4|Adafruit Grand Central M4
-  [Teensy 3.2/3.1](//www.pjrc.com/teensy/teensy31.html)|MK20DX256VLH7 ARM® Cortex-M4|
-  [Teensy 3.5](//www.pjrc.com/store/teensy35.html)|MK64FX512-VMD12 ARM® Cortex-M4|
-  [Teensy 3.6](//www.pjrc.com/store/teensy36.html)|MK66FX1MB-VMD18 ARM® Cortex-M4|
-  [Teensy 4.0](//www.pjrc.com/store/teensy40.html)|MIMXRT1062-DVL6B ARM® Cortex-M7|
-  [Teensy 4.1](//www.pjrc.com/store/teensy41.html)|MIMXRT1062-DVJ6B ARM® Cortex-M7|
-  Linux Native|x86 / ARM / RISC-V|Raspberry Pi GPIO
-  Simulator|Windows, macOS, Linux|Desktop OS
-  [All supported boards](//marlinfw.org/docs/hardware/boards.html#boards-list)|All platforms|All boards
+---
 
-## Marlin Support
+### 3.2 V-Slot-Rollen einstellen
 
-The Issue Queue is reserved for Bug Reports and Feature Requests. Please use the following resources for help with configuration and troubleshooting:
+**Exzenter-Muttern an X-, Y- und Z-Achse:**
+1. Achse von Hand bewegen
+2. Rolle sollte spielfrei sein, aber sich leicht drehen
+3. Exzenter-Mutter drehen, bis Spiel verschwunden ist
+4. Leichtgängigkeit prüfen
 
-- [Marlin Documentation](//marlinfw.org) - Official Marlin documentation
-- [Marlin Discord](//discord.com/servers/marlin-firmware-461605380783472640) - Discuss issues with Marlin users and developers
-- Facebook Group ["Marlin Firmware"](//www.facebook.com/groups/1049718498464482/)
-- RepRap.org [Marlin Forum](//forums.reprap.org/list.php?415)
-- Facebook Group ["Marlin Firmware for 3D Printers"](//www.facebook.com/groups/3Dtechtalk/)
-- [Marlin Configuration](//www.youtube.com/results?search_query=marlin+configuration) on YouTube
+**Hinweis:** Nicht zu fest anziehen, sonst blockiert die Rolle.
 
-## Contributing Patches
+---
 
-You can contribute patches by submitting a Pull Request to the ([bugfix-2.1.x](//github.com/MarlinFirmware/Marlin/tree/bugfix-2.1.x)) branch.
+### 3.3 Z-Achse prüfen
 
-- We use branches named with a "bugfix" or "dev" prefix to fix bugs and integrate new features.
-- Follow the [Coding Standards](//marlinfw.org/docs/development/coding_standards.html) to gain points with the maintainers.
-- Please submit Feature Requests and Bug Reports to the [Issue Queue](//github.com/MarlinFirmware/Marlin/issues/new/choose). See above for user support.
-- Whenever you add new features, be sure to add one or more build tests to `buildroot/tests`. Any tests added to a PR will be run within that PR on GitHub servers as soon as they are pushed. To minimize iteration be sure to run your new tests locally, if possible.
-  - Local build tests:
-    - All: `make tests-config-all-local`
-    - Single: `make tests-config-single-local TEST_TARGET=...`
-  - Local build tests in Docker:
-    - All: `make tests-config-all-local-docker`
-    - Single: `make tests-config-all-local-docker TEST_TARGET=...`
-  - To run all unit test suites:
-    - Using PIO: `platformio run -t test-marlin`
-    - Using Make: `make unit-test-all-local`
-    - Using Docker + make: `maker unit-test-all-local-docker`
-  - To run a single unit test suite:
-    - Using PIO: `platformio run -t marlin_<test-suite-name>`
-    - Using make: `make unit-test-single-local TEST_TARGET=<test-suite-name>`
-    - Using Docker + make: `maker unit-test-single-local-docker TEST_TARGET=<test-suite-name>`
-- If your feature can be unit tested, add one or more unit tests. For more information see our documentation on [Unit Tests](test).
+1. Drucker ausschalten
+2. Druckkopf von Hand bewegen
+3. Bewegung muss glatt und ohne Widerstand sein
+4. Bei Problemen: Spindel ausrichten, Kupplung festziehen, PTFE-Spray auftragen
 
-## Contributors
+---
 
-Marlin is constantly improving thanks to a huge number of contributors from all over the world bringing their specialties and talents. Huge thanks are due to [all the contributors](//github.com/MarlinFirmware/Marlin/graphs/contributors) who regularly patch up bugs, help direct traffic, and basically keep Marlin from falling apart. Marlin's continued existence would not be possible without them.
+### 3.4 Bett reinigen
 
-Marlin Firmware original logo design by Ahmet Cem TURAN [@ahmetcemturan](//github.com/ahmetcemturan).
+**Achtung:** Bett ist mit Thermoklebeband fixiert und lässt sich daher nicht zur Reinigung lösen!
 
-## Project Leadership
+1. Bei Haftungsproblemen oder nach mehreren Drucken:
+   - Tuch leicht mit Spülmittelwasser (Fit) anfeuchten
+   - Bett abwischen
+   - Sofort mit trockenem Tuch nachpolieren
+2. Alternativ: Trockener Glasreiniger verwenden
+3. **Nie** direktes Wasser verwenden (Gefahr für Heizbett-Kontakte und Elektronik)
 
-Name|Role|Link|Donate
-----|----|----|----
-🇺🇸 Scott Lahteine|Project Lead|[[@thinkyhead](//github.com/thinkyhead)]|[💸 Donate](//marlinfw.org/docs/development/contributing.html#donate)
-🇺🇸 Roxanne Neufeld|Admin|[[@Roxy-3D](//github.com/Roxy-3D)]|
-🇺🇸 Keith Bennett|Admin|[[@thisiskeithb](//github.com/thisiskeithb)]|[💸 Donate](//github.com/sponsors/thisiskeithb)
-🇺🇸 Jason Smith|Admin|[[@sjasonsmith](//github.com/sjasonsmith)]|
-🇧🇷 Victor Oliveira|Admin|[[@rhapsodyv](//github.com/rhapsodyv)]|
-🇬🇧 Chris Pepper|Admin|[[@p3p](//github.com/p3p)]|
-🇳🇿 Peter Ellens|Admin|[[@ellensp](//github.com/ellensp)]|[💸 Donate](//ko-fi.com/ellensp)
-🇺🇸 Bob Kuhn|Admin|[[@Bob-the-Kuhn](//github.com/Bob-the-Kuhn)]|
-🇳🇱 Erik van der Zalm|Founder|[[@ErikZalm](//github.com/ErikZalm)]|
+---
 
-## Star History
+## 4. Haftmittel und Hilfsmittel
 
-<a id="starchart" href="https://star-history.com/#MarlinFirmware/Marlin&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=MarlinFirmware/Marlin&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=MarlinFirmware/Marlin&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=MarlinFirmware/Marlin&type=Date" />
-  </picture>
-</a>
+### 4.1 Haftmittel für Glasbett
 
-## License
+**Klebestift (z. B. UHU / Adler):**
+- Hauchdünn auf die **kalte** Druckfläche auftragen
+- Bei Bedarf mit feuchtem Tuch gleichmäßig verstreichen
+- **Für PLA:** Haftverstärker
+- **Für PETG:** Zwingend als Trennschicht verwenden, um Glasschäden zu vermeiden
 
-Marlin is published under the [GPL license](/LICENSE) because we believe in open development. The GPL comes with both rights and obligations. Whether you use Marlin firmware as the driver for your open or closed-source product, you must keep Marlin open, and you must provide your compatible Marlin source code to end users upon request. The most straightforward way to comply with the Marlin license is to make a fork of Marlin on Github, perform your modifications, and direct users to your modified fork.
+**3D-Druck-Spezialspray oder Haarspray:**
+- Aus 20–30 cm Entfernung sparsam aufsprühen
+- Erzeugt eine gleichmäßige, hauchdünne Haftschicht ohne Unebenheiten
+
+**Maler-Kreppband:**
+- Bahnen stoß auf stoß ohne Überlappung und ohne Blasen aufkleben
+- Bietet eine raue mechanische Struktur für schwierige Geometrien oder abgenutztes Glas
+
+**Zuckerwasser:**
+- Haushaltszucker in heißem Wasser auflösen
+- Mit Pinsel dünn auf das **aufgeheizte** Glasbett auftragen
+- Bildet nach dem Verdunsten eine klebrige Schicht
+- Lässt sich nach dem Druck mit feuchtem Tuch rückstandsfrei entfernen
+
+**Salzwasser:**
+- Normales Speisesalz in heißem Wasser auflösen
+- Mit Tuch dünn auf das **heiße** Glasbett auftragen
+- Nach dem Verdunsten entsteht eine mikroskopische Kristallschicht
+- PLA haftet extrem gut, Schicht platzt nach Abkühlen von alleine ab
+
+---
+
+### 4.2 Filamenttrocknung
+
+**Karton als Filamenttrockner:**
+1. Spule flach auf das beheizte Druckbett (50–60 °C für PLA) legen
+2. Karton mit ein paar kleinen Luftlöchern darüberstülpen
+3. 4–6 Stunden heizen
+4. Das Druckbett dient als Heizquelle, der Karton hält die Wärme
+
+**Gefrierbeutel + Staubsauger als Vakuumkammer:**
+1. Filament zusammen mit Silikagel-Päckchen in einen dicht schließenden Ziploc-Beutel legen
+2. Staubsauger an die verbleibende kleine Öffnung halten
+3. Luft absaugen
+4. Beutel schnell versiegeln
+
+---
+
+### 4.3 Leveling-Hilfsmittel
+
+**Kassenbon statt A4-Papier:**
+- Thermopapier von Kassenbons ist mit **0,03–0,05 mm** deutlich dünner als Standard-Druckerpapier (ca. 0,1 mm)
+- Ermöglicht präzisere Z-Offset-Einstellung für eine stramme erste Schicht
+
+---
+
+### 4.4 Reparatur und Nachbearbeitung
+
+**Sekundenkleber + Natron als Instant-Spachtel:**
+1. Lücken oder Risse an Bauteilen mit Sekundenkleber füllen
+2. Sofort Haushaltsnatron drüberstreuen
+3. Chemische Reaktion lässt den Kleber innerhalb einer Sekunde steinhart aushärten
+4. Masse lässt sich danach direkt schleifen und bohren
+
+**Lötkolben als Kunststoff-Schweißgerät:**
+1. Regelbaren Lötkolben auf ca. 200 °C stellen
+2. Bruchkanten zweier Teile leicht anschmelzen
+3. Stück rohes Filament wie einen Schweißdraht in die Fuge schmelzen
+
+**Stringing abflämmen:**
+- Feine Filamentfäden mit Sturmfeuerzeug, Mini-Lötlampe oder Heißluftfön entfernen
+- Kurzes, schnelles Drüberfahren mit der Flamme zieht die Fäden spurlos zusammen
+- Oberfläche des Bauteils bleibt unverformt
+
+---
+
+## 5. Kalibrierung
+
+### 5.1 E-Steps kalibrieren
+
+**Benötigt:** Messschieber, Filament, Stift
+
+1. Aktuellen Wert notieren:
+   Menü: Control → Motion → Steps/mm → E-steps/mm
+   Standardwert: **97 (Metall-Extruder)**
+   **Zukünftig nach BMG-Umbau: ~415 (nur nach Extruder-Tausch eintragen!)**
+
+2. Filament markieren:
+   120 mm vom Extrudereintritt aus abmessen und markieren
+
+3. Filament fördern:
+   Hotend auf 200 °C aufheizen
+   Menü: Control → Motion → Move E → 100 mm extrudieren
+
+4. Gemessene Länge bestimmen:
+   Restlänge vom Gehäuse bis zur Marke messen
+   Beispiel: 25 mm Rest = 95 mm gefördert
+
+5. Neuer Wert berechnen:
+   ```
+   Neuer E-Steps = (Aktueller E-Steps × 100) / Gemessene Länge
+   Beispiel: (93 × 100) / 95 = 97,89 → 98
+   ```
+
+6. Wert speichern:
+   Menü: Control → Motion → Steps/mm → E-steps/mm
+   Mit "Store Settings" speichern
+
+7. Prüfen: Test wiederholen
+
+---
+
+### 5.2 PID-Tuning
+
+1. Menü: Configuration → Advanced Settings → Temperature → PID-Tuning
+2. Wählen zwischen Hotend oder Bett
+3. Zieltemperatur auswählen (z. B. 200 °C für PLA Hotend, 60 °C für Bett)
+4. Bei Hotend: Bauteillüfter auf 100 % stellen
+5. Tuning-Prozess starten und abwarten
+6. Mit "Store Settings" speichern
+
+---
+
+### 5.3 Bed Leveling
+
+**Bed Tramming**
+1. Menü: Prepare → Bed Tramming
+2. Drucker fährt automatisch die Positionen über den vier Bettschrauben an
+3. An jeder Position die Bettschrauben so weit drehen, bis ein Papier zwischen Bett und Düse passt.
+   Der genaue Abstand ist **nicht** relevant, er sollte jedoch an allen Ecken **gleich** sein.
+
+---
+
+### 5.4 Mesh-Erstellung mit CR Touch
+
+1. Bett und Hotend auf Drucktemperatur aufheizen
+2. Menü: Prepare → Auto Home (G28)
+3. **Wichtig:** Hotend während G29 auf **150 °C** halten, um Düsentropfen zu vermeiden
+4. Menü: Prepare → Bed Leveling → Auto Bed Leveling (G29)
+5. **G29 startet eine neue Vermessung**
+6. Erst nach G29 Hotend auf finale Zieltemperatur aufheizen
+
+---
+
+### 5.5 Z-Offset einstellen (mit CR Touch)
+
+1. Normalen Testdruck (1-Layer-Quadrat) starten
+   1. Rechtsklick in Orca auf das Druckbett
+   2. Primitiv einfügen --> Quadrat
+   3. Primitiv in der Skalierung auf 150mm x 150mm x 0,2mm (xyz) einstellen
+2. Während des Drucks erste Schicht beobachten:
+   - Zu hoch: Material wird mitgezogen → Z-Offset verringern
+   - Zu niedrig: Düse drückt ins Bett → Z-Offset erhöhen
+3. Babystepping während des Drucks:
+   Menü → Tune → Babystep Z (0,02 mm Schritte)
+4. Optimalen Wert finden
+5. Dauerhaft speichern:
+   - Babystep Z während des Drucks aufschreiben und vom Z-Offset abziehen
+
+> **WICHTIG:** Babystep-Z und Z-Offset sind verschiedene Eigenschaften. Babysteps gelten nur während des aktuellen Drucks, Z-Offset gilt permanent. Ergebnisse des Babysteppings müssen daher mit dem Z-Offset verrechnet werdeen.
+
+
+
+---
+
+## 6. Orca Slicer Einstellungen
+
+### 6.1 Druckerprofil
+
+- **Start-G-Code:**
+  ```gcode
+   ; Start G-Code fuer Ender 3 Pro (OrcaSlicer + Marlin UBL)
+   G90 ; Absolute Positionierung
+   M83 ; Extruder relativer Modus
+
+   ; Bett heizen und Nozzle auf 150°C vorheizen (verhindert Oozing waehrend G28/G29)
+   M140 S[first_layer_bed_temperature]
+   M104 S150
+   M190 S[first_layer_bed_temperature]
+
+   G28 ; Homing aller Achsen
+   G29 L0 ; Bed Mesh aus Slot 0 laden
+   G29 A ; UBL aktivieren
+   G29 J2 ; 3-Punkt-Messung zur Ausrichtung des Meshes an aktuellen Bett-Tilt
+
+   G1 X0.1 Y20 Z10 F5000.0 ; Warten vor dem Aufheizen
+   M109 S[first_layer_temperature] ; Nozzle auf Zieltemperatur bringen
+
+   ; Prime Line (Purge Line)
+   G1 Z0.3 F3000
+   G1 X0.1 Y200.0 E15 F1500.0 ; Erste Linie
+   G1 X0.4 Y200.0 F5000.0
+   G1 X0.4 Y20.0 E30 F1500.0 ; Zweite Linie
+   G92 E0 ; Extruder zuruecksetzen
+   G1 Z2.0 F3000
+  ```
+
+- **End-G-Code:**
+   ``` gcode
+   ; End G-Code fuer Ender 3 Pro (OrcaSlicer)
+   G91 ; Relative Positionierung
+   G1 E-2 F2700 ; Filament leicht zurückziehen
+   G1 E-2 Z0.2 F2400 ; Z anheben und weiter zurückziehen
+   G1 X5 Y5 F3000 ; Duese vom Objekt wegbewegen
+   G1 Z10 F3000 ; Z-Achse weiter anheben
+   G90 ; Absolute Positionierung
+
+   G1 X0 Y220 F3000 ; Druckbett nach vorne fahren
+   M104 S0 ; Hotend ausschalten
+   M140 S0 ; Heizbett ausschalten
+   M107 ; Luefter ausschalten
+   M84 ; Motoren deaktivieren
+   ```
+
+  **Hinweis:** Orca regelt Aufheizsequenzen selbstständig über Platzhalter. Die Purge Line stellt sicher, dass die Düse zu Druckbeginn ausreichend Material fördert. Der E-Wert steigt fortlaufend (E15 → E30), um Rückzug zu vermeiden.
+
+- **Z-Hop/Z-Lift:** Im Extruder-Profil **deaktivieren**
+
+---
+
+### 6.2 Filament-Profil
+
+- **Retraction:** 2,5–3,5 mm (wegen Bi-Metall Heatbreak, 4 mm kann zu Verstopfungen führen)
+- **Lüfter:** 0 % für erste 1–2 Schichten, danach höher, entsprechend des Materials
+
+---
+
+### 6.3 Kalibrierung
+
+Orca Slicer generiert alle Testdrucke automatisch:
+
+1. Menü: **Calibration**
+2. Auswählen:
+   - **Temperature:** Temperatur-Tower mit automatischen Temperaturwechseln
+   - **Max Flow Rate:** Flow-Rate-Test mit automatischer Berechnung
+   - **Retraction:** Retraction-Tower mit verschiedenen Einstellungen
+   - **Pressure Advance:** (optional, für Fortgeschrittene, gleichbedeutend mit Linear Advance)
+3. Testdruck starten und Ergebnisse auswerten
+
+---
+
+## 7. Fehlerbehebung
+
+| Fehlerbild | Ursache | Lösung |
+|------------|---------|--------|
+| Schlechte Überhänge (kurze Geometrien) | Lüfter zu langsam | Mindestschichtzeit auf 10–15 s erhöhen |
+| Unregelmäßige Schichtlinien | Unterschiedliche Abkühlzeiten | Mindestschichtzeit erhöhen, gleichmäßige Geschwindigkeiten |
+| Ausgebeulte Ecken | Zu hohe Beschleunigung, Fehlendes Linear Advance | Beschleunigung auf 500–1000 mm/s² reduzieren, Marlin mit Linear Advance kompilieren, flashen und tunen |
+| Keine Schichthaftung | Z-Offset zu hoch, Bett verschmutzt | Z-Offset verringern, Bett reinigen, Haftmittel auftragen |
+| Düse reibt | Z-Offset zu niedrig | Z-Offset erhöhen |
+| Stringing | Rückzug zu gering, Temperatur zu hoch | Rückzug auf 2,5–3,5 mm einstellen, Temperatur senken |
+| Verstopfung | Retraction zu hoch | Retraction auf max. 3,5 mm begrenzen |
+| Warping | Bett zu kalt, Zugluft | Bett auf 65 °C (PLA) erhöhen, Zugluft vermeiden |
+| Elefantenfuß | Z-Offset zu niedrig, Bett zu heiß | Z-Offset erhöhen, Bett-Temperatur senken |
+| Unterextrusion | E-Steps falsch, Flow zu niedrig | E-Steps kalibrieren, Flow Rate erhöhen |
+| Schichtversatz | Riemen lose, Treiber überhitzt | Riemen nachspannen, Treiber kühlen |
+| Ringing | Mechanische Schwingungen | Beschleunigung reduzieren, Schrauben nachziehen |
+
+---
+
+## 8. Glossar
+
+### A
+- **ABL (Automatic Bed Leveling):** Automatische Bettvermessung mit CR Touch.
+
+### B
+- **Babystepping:** Feine Z-Offset-Anpassung während des Drucks.
+- **Bed Leveling:** Ausrichten des Betts parallel zur X/Y-Ebene.
+- **Bed Tramming:** Automatisches Anfahren der Bettschrauben-Positionen für einfaches Leveling.
+- **Bi-Metall Heatbreak:** Heatbreak aus zwei Metallen, PTFE endet vor dem Heatbreak.
+- **BLTouch / CR Touch:** Sensoren für automatische Bettvermessung.
+- **Bowden Drive:** Extruder am Rahmen, Filament wird durch Schlauch zum Hotend gefördert.
+
+### C
+- **CR Touch:** Automatischer Bett-Sensor von Creality.
+
+### D
+- **Direct Drive:** Extruder direkt am Druckkopf.
+- **Düse (Nozzle):** Austrittsöffnung für geschmolzenes Filament.
+
+### E
+- **E-Steps (Extruder Steps/mm):** Motorschritte für 1 mm Filamentförderung.
+- **Elefantenfuß:** Breitgedrückte unterste Schichten.
+- **Extruder:** Fördermechanismus für Filament.
+- **Extrusionsmultiplikator (Flow Rate):** Prozentuale Anpassung der Materialmenge.
+
+### F
+- **Firmware:** Steuerungssoftware des Druckers.
+- **Filament:** Kunststoffdraht als Druckmaterial.
+- **First Layer:** Erste Schicht, entscheidend für Haftung.
+
+### G
+- **G-Code:** Maschinensprache für 3D-Drucker.
+- **G28:** Homing-Befehl.
+- **G29:** Startet neue Bettvermessung mit CR Touch.
+- **Glass Chipping:** Glassplitter werden durch PETG beim Abkühlen aus der Oberfläche gerissen.
+
+### H
+- **Heatbreak:** Übergangsstück zwischen Kühlkörper und Heizblock.
+- **Hotend:** Beheizter Teil, der Filament schmilzt.
+
+### I
+- **Inverted Electronics Mod:** Elektronik um 180° gedreht für bessere Zugänglichkeit.
+
+### J
+- **Jerk:** Sofortige Geschwindigkeitsänderung.
+
+### L
+- **Layer Height:** Schichtdicke.
+- **Layer Shift:** Schichtversatz.
+
+### M
+- **Mainboard 4.2.2:** 32-Bit Hauptplatine mit leisen Treibern.
+- **Mesh:** Virtuelles Gitter der Bett-Unebenheiten.
+
+### P
+- **PID:** Temperaturregelungsalgorithmus.
+- **PLA:** Einfaches, biologisch abbaubares Filament.
+- **PETG:** Zähes, temperaturbeständiges Filament.
+- **Purge Line / Prime Line:** Reinigungslinie am Bettrand zu Druckbeginn.
+
+### R
+- **Release Agent:** Trennschicht, die verhindert, dass Material am Bett haftet (z. B. Klebestift bei PETG).
+- **Retraction:** Filament-Rückzug bei Leerfahrten.
+- **Ringing:** Schattenmuster durch Schwingungen.
+
+### S
+- **Silikagel:** Trocknungsmittel zur Filamenttrocknung.
+- **Silikonpuffer:** Ersetzen Metallfedern unter dem Bett für mehr Stabilität.
+- **Slicer:** Software zur G-Code-Erstellung (Orca Slicer empfohlen).
+- **Stringing:** Unerwünschte Kunststofffäden.
+
+### T
+- **Thermal Runaway Protection:** Sicherheitsabschaltung bei Temperaturproblemen.
+- **Tramming Wizard:** Assistent für automatisches Bed Leveling.
+
+### V
+- **Vase Mode:** Druckmodus mit einer Wand.
+
+### W
+- **Warping:** Verziehen der Bauteilkanten.
+
+### Z
+- **Z-Offset:** Abstand zwischen CR Touch-Auslösepunkt und Düsenspitze.
+
+---
+
+## 9. Referenzlinks
+
+### Kalibrierung
+- [Creality Ender 3 Calibration Guide](https://store.creality.com/blogs/all/ender-3-calibration)
+- [All3DP Ender 3 Calibration](https://all3dp.com/2/ender-3-calibration-how-to-calibrate-your-ender-3/)
+- [Shiny Upgrades: Ender 3 Pro Tuning](https://shinyupgrades.com/pages/tuning-and-calibrating-the-ender-3-pro)
+
+### CR Touch & Bed Leveling
+- [UAVMODEL: BLTouch/CR Touch Guide](https://blog.uavmodel.com/bltouch-and-cr-touch-auto-bed-leveling-installation-firmware-and-probe-accuracy-2026-guide/)
+
+### Fehlerbehebung
+- [All3DP: Common Problems](https://all3dp.com/1/common-3d-printing-problems-troubleshooting-3d-printer-issues/)
+- [Prusa: First Layer Troubleshooting](https://help.prusa3d.com/article/first-layer-issues_1804)
+
+---
+
+## 10. Anhang: Firmware-Update
+
+### Firmware-Update per SD-Karte
+
+1. Kompilierte .bin-Datei besorgen
+2. SD-Karte vorbereiten:
+   - FAT32 formatieren (max. 32 GB)
+   - Zuordnungseinheiten: 4096 Bytes
+3. .bin-Datei im **Hauptverzeichnis** der SD-Karte ablegen
+4. **Wichtig:** Dateiname bei jedem Flash-Vorgang ändern:
+   - Beispiel: firmware_01.bin, firmware_02.bin, firmware_03.bin
+   - Das Mainboard v4.2.2 speichert den zuletzt geflashten Namen im EEPROM und ignoriert identische Dateinamen
+5. SD-Karte in den **ausgeschalteten** Drucker einstecken
+6. Drucker einschalten
+7. **Wichtig:** LCD-Bildschirm bleibt nach dem Einschalten für **5–15 Sekunden komplett blau/leer** – wenn nicht, wurde **nicht** geflasht!
+8. Flash-Vorgang läuft automatisch beim Booten ab (dauert wenige Sekunden)
